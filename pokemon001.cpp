@@ -5,13 +5,16 @@ public:
 	Pokemon();
 	Pokemon(std::string name,int level,int type,int hp,int atk, int def,int special_atk,int special_def,int agi) ;	
 	~Pokemon();
-	int GetAtack(int waza);
-	int SetAtack(int atack_point);
+	int GetAtackP(int waza);
+	int Battle(int atack_point);
 	std::string getName() {
 		return name;
 	}
 	int getLevel() {
 		return level;
+	}
+	int getAgi() {
+		return agi;
 	}
 private:
 	std::string name;	// 文字列
@@ -22,8 +25,8 @@ private:
 	int def;		// 防御
 	int special_atk;	// とくこう
 	int special_def;	// とくぼう
-	int agi;		// すばやさ
-	int waza[];		// 技リスト
+	int agi;			// すばやさ
+	int waza[4];			// 技リスト
 };
 // コンストラクタ
 Pokemon::Pokemon() {
@@ -31,69 +34,105 @@ Pokemon::Pokemon() {
 	this->special_atk = 46; this->special_def = 39; this->agi = 49;
 }
 Pokemon::Pokemon(std::string name,int level,int type,int hp,int atk, int def,int special_atk,int special_def,int agi) {
-	this->name = name;
-	this->level = level;
-	this->hp = hp;
-	this->atk = atk;
-	this->def = def;
-	this->special_atk = special_atk;
-	this->special_def = special_atk;
-	this->agi = agi;
+	this->name = name; this->level = level; this->hp = hp; this->atk = atk; this->def = def;
+	this->special_atk = special_atk; this->special_def = special_atk; this->agi = agi;
 }
 // デストラクタ
 Pokemon::~Pokemon() {
 }
-int Pokemon::GetAtack(int waza) {
+int Pokemon::GetAtackP(int waza) {
 	return atk*(waza/100+1);
 }
 // 攻撃値を引数として呼び出すと戻り値でHPを返す
-int Pokemon::SetAtack(int atack_point) {
+int Pokemon::Battle(int atack_point) {
 	int buttle_point = atack_point - this->def;
+	std::cout 
+	<< this->getName() 
+	<< "は"
+	<< buttle_point
+	<< "のダメージ" << std::endl
+	<< this->getName() 
+	<< "のHPは" << hp << std::endl
+	<< std::endl;
+
 	if(buttle_point>0) {
-		this->hp -= buttle_point;
+		hp = hp - buttle_point;
 	}
-	return this->hp;
+	if(this->hp < 0) {
+		hp = 0 ;
+	}
+	return hp;
 }
 
 int main() {
 	// coutの実験
-	std::cout << "ポケモンバトル開始" << std::endl;
+	std::cout << "ポケモンバトル開始します" << std::endl
+		<< std::endl;
 
 	// ポケモンAオブジェクトを生成
-	Pokemon pokemon_a = Pokemon("フロウ",30,1,183,43,39,46,39,49);
+	Pokemon pokemon_a = Pokemon("フロウA",30,1,183,43,39,46,39,49);
 	std::cout << "ポケモンAのステータス" << std::endl
 		<< "名前:" << pokemon_a.getName() << std::endl	// 文字列
-		<< "レベル:" << pokemon_a.getLevel() << std::endl;	// 文字列
+		<< "レベル:" << pokemon_a.getLevel() << std::endl	// 文字列
+		<< std::endl ;
 
 	// ポケモンBオブジェクトを生成
-	Pokemon pokemon_b;
+	Pokemon pokemon_b = Pokemon("フロウB",28,1,163,40,34,43,37,51);
+	std::cout << "ポケモンBのステータス" << std::endl
+		<< "名前:" << pokemon_a.getName() << std::endl	// 文字列
+		<< "レベル:" << pokemon_a.getLevel() << std::endl	// 文字列
+		<< std::endl ;
+
+	Pokemon pokemon[2];
 
 	// どちらから攻撃か決定してバトルを始める
-	// if(pokemon_a.GetAgi > pokemon_b.GetAgi) {
-	// } else {
-	// }
+	if(pokemon_a.getAgi() > pokemon_b.getAgi()) {
+		pokemon[0] = pokemon_a ;
+		pokemon[1] = pokemon_b ;
+	} else {
+		pokemon[1] = pokemon_a ;
+		pokemon[0] = pokemon_b ;
+	}
 
+	while(true) {
 	// 先行のポケモンの攻撃
     // 攻撃値を取得する。 技は40固定
 
-	int attack_point = pokemon_a.GetAtack(40);
+	std::cout 
+		<< pokemon[0].getName() 
+		<< "の攻撃" <<std::endl
+		<< std::endl;
+	int attack_point = pokemon[0].GetAtackP(400);
 
 	// 防御ポケモンにダメージを入れる
-	int defence_hp = pokemon_b.SetAtack(attack_point);
+	int defence_hp = pokemon[1].Battle(attack_point);
 
 	if (defence_hp <= 0) {
-		// 防御ポケモンは倒れました。
-
+		std::cout << pokemon[1].getName() << "は倒れました" << std::endl
+		<< std::endl ;
+		std::cout << pokemon[0].getName() << "が勝利しました" << std::endl
+		<< std::endl ;
+		exit(0);
 	}
 
 	// 後攻ポケモンの攻撃
 	// 攻撃値を取得する。 技は40固定
 
-	attack_point = pokemon_b.GetAtack(40);
+	std::cout 
+		<< pokemon[1].getName() 
+		<< "の攻撃" <<std::endl
+		<< std::endl;
+	attack_point = pokemon[1].GetAtackP(40);
+
 	// 防御ポケモンにダメージを入れる
-	defence_hp = pokemon_a.SetAtack(attack_point);
+	defence_hp = pokemon[0].Battle(attack_point);
 	if (defence_hp <= 0) {
 		// 防御ポケモンは倒れました。
-
+		std::cout << pokemon[0].getName() << "は倒れました" << std::endl
+		<< std::endl ;
+		std::cout << pokemon[1].getName() << "が勝利しました" << std::endl
+		<< std::endl ;
+		exit(0);
+	}
 	}
 }
